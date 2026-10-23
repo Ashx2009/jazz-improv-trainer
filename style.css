@@ -1,0 +1,367 @@
+:root {
+  --ink: #1C251C;
+  --mute: #4A5847;
+  --blue: #1747C9;
+  --yel: #F2B705;
+  --red: #D8432B;
+  --bg: #F4F4F1;
+  --card-bg: #FBFBF8;
+  --gray: #E6E6E1;            /* พื้นเทาของแถบคอร์ดตามสเก็ตช์ */
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 16px/1.5 'IBM Plex Sans Thai', system-ui, sans-serif;
+  transition: background-color 0.3s ease;
+}
+
+button { font: inherit; cursor: pointer; }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+
+.lab { display: block; font-size: 13px; color: var(--mute); margin-bottom: 6px; }
+.hint { font-size: 14px; color: var(--mute); }
+.okmsg { font-size: 14px; font-weight: 600; color: #17806D; min-height: 21px; }
+.sec { padding: 24px 0; border-bottom: 1px solid var(--ink); }
+
+/* ───────── 1) Header ───────── */
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 20px 0;
+}
+
+.logo {
+  margin: 0;
+  padding: 8px 18px;
+  border: 2px solid var(--ink);
+  background: var(--card-bg);
+  font: 800 22px 'Archivo', sans-serif;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.tabs { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+.tab {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 2px solid var(--ink);
+  background: var(--card-bg);
+  color: var(--ink);
+  font-weight: 600;
+}
+.tab.on { background: var(--ink); color: #fff; }
+
+.midi { margin-right: 8px; font-size: 14px; color: var(--mute); }
+.midi::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #9a9890; margin-right: 8px; }
+.midi.on::before { background: var(--blue); }
+
+/* ───────── 2) แถบคอร์ดใหญ่ ───────── */
+.chart { display: flex; flex-wrap: wrap; border: 2px solid var(--ink); background: var(--gray); }
+.ch {
+  flex: 1 1 150px;
+  padding: 22px 20px 18px;
+  border-right: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  margin: 0 -1px -1px 0;
+  font: 800 clamp(30px, 4.6vw, 56px)/1.15 'Archivo', sans-serif;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, color 0.15s;
+}
+.ch:hover { background: #D9D9D3; }
+.ch small { display: block; font: 400 14px 'IBM Plex Sans Thai', sans-serif; color: var(--mute); }
+.ch.cur { background: var(--ink); color: #fff; }
+.ch.cur small { color: #DCE5FB; }
+.ch.sel-only { outline: 3px solid var(--yel); outline-offset: -3px; }
+
+/* ───────── 3) เลือก progression / พิมพ์คอร์ด ───────── */
+.row { display: flex; gap: 16px; align-items: center; margin: 18px 0 8px; flex-wrap: wrap; }
+.row select { width: 240px; }
+.row input { flex: 1 1 260px; max-width: 420px; }
+
+select, input[type=text] {
+  width: 100%;
+  height: 48px;
+  padding: 0 12px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  background: var(--card-bg);
+  color: var(--ink);
+  font: inherit;
+}
+
+.btn, .sm { background: var(--card-bg); border: 2px solid var(--ink); padding: 0 16px; height: 44px; font-weight: 600; color: var(--ink); transition: background 0.2s, color 0.2s; }
+.sm { height: 40px; font-size: 14px; }
+.btn.on { background: var(--ink); color: #fff; }
+
+/* ───────── 4) คำอธิบายสี + เปียโน ───────── */
+.keys { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 28px; align-items: start; }
+
+.lg { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14px; color: var(--mute); }
+.lg li { display: flex; align-items: center; }
+.lg i { flex: none; width: 12px; height: 12px; margin-right: 10px; border: 1px solid var(--ink); }
+
+.kb { min-width: 0; }
+.pw { overflow-x: auto; }
+#piano { position: relative; height: 190px; min-width: 680px; border: 2px solid var(--ink); background: #fff; user-select: none; touch-action: none; }
+.kb .hint { margin: 10px 0 0; }
+
+.w, .b { display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; font: 700 12px 'Archivo', sans-serif; color: #fff; }
+.w { position: absolute; top: 0; height: 100%; background: #fff; border-right: 1px solid var(--ink); color: var(--mute); }
+.b { position: absolute; top: 0; height: 60%; background: var(--ink); z-index: 2; color: #fff; }
+
+.w.chord, .b.chord { background: var(--blue); color: #fff; }
+.w.scale, .b.scale { background: #A9C0F2; color: var(--ink); }
+.w.alt, .b.alt { background: #6B3FB5; color: #fff; }
+.w.enc, .b.enc { background: #17806D; color: #fff; }
+.w.pend, .b.pend { background: #8a8f98; color: #fff; }
+.w.out, .b.out { background: var(--red); color: #fff; }
+.w.sug, .b.sug { box-shadow: inset 0 -10px 0 var(--yel); }
+
+/* ───────── 5) แผงล่าง 3 คอลัมน์ ───────── */
+.panel {
+  display: grid;
+  grid-template-columns: minmax(340px, 1.35fr) minmax(170px, .7fr) minmax(300px, 1.3fr);
+  gap: 0 32px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--ink);
+}
+.col { min-width: 0; }
+.now { padding-left: 32px; border-left: 2px solid var(--ink); display: flex; flex-direction: column; gap: 28px; }
+
+/* ควบคุม: ปุ่มเริ่มใหญ่ซ้าย / คีย์ + BPM ขวา / จังหวะ + สไตล์ แถวล่าง */
+.ctl { display: grid; grid-template-columns: 150px minmax(96px, 1fr) minmax(150px, 1.2fr); gap: 18px 20px; align-items: end; align-content: start; }
+.play { grid-column: 1; grid-row: 1; height: 64px; background: var(--ink); color: #fff; border: 0; font-size: 22px; font-weight: 700; }
+.f-key  { grid-column: 2; grid-row: 1; }
+.f-bpm  { grid-column: 3; grid-row: 1; }
+.f-ts   { grid-column: 1; grid-row: 2; }
+.f-style{ grid-column: 2 / 4; grid-row: 2; }
+.opts { grid-column: 1 / -1; grid-row: 3; display: flex; gap: 22px; flex-wrap: wrap; font-size: 14px; color: var(--mute); }
+.opts label { display: flex; align-items: center; gap: 8px; }
+
+.step { display: flex; align-items: center; justify-content: space-between; height: 48px; border: 2px solid var(--ink); background: var(--card-bg); }
+.step button { flex: none; width: 40px; height: 100%; background: none; border: 0; font: 700 24px 'Archivo', sans-serif; }
+.step button:hover { background: var(--gray); }
+.step input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: center;
+  font: 800 26px 'Archivo', sans-serif;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.step input::-webkit-outer-spin-button,
+.step input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.step input:focus { outline: none; background: #FFF6D6; }
+.step:focus-within { outline: 3px solid var(--yel); outline-offset: 2px; }
+
+/* กำลังเล่น + chips */
+.chord { font: 800 clamp(36px, 5vw, 64px)/1.1 'Archivo', sans-serif; word-break: break-word; overflow-wrap: break-word; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 12px; }
+.chip { display: inline-flex; align-items: center; padding: 6px 11px; border: 2px solid var(--ink); background: var(--card-bg); font: 600 14px 'IBM Plex Sans Thai', sans-serif; }
+
+#guide .chip, #lick .chip { min-width: 44px; height: 44px; justify-content: center; font: 800 18px 'Archivo', sans-serif; }
+#guide .chip.g, #lick .chip.g { background: var(--yel); color: var(--ink); font-weight: 800; }
+#lick .chip { min-width: 40px; height: 40px; font-size: 16px; }
+
+.chip.a { border-color: #6B3FB5; color: #6B3FB5; }
+.chip.t-chord { background: var(--blue); color: #fff; }
+.chip.t-scale { background: #A9C0F2; }
+.chip.t-alt { background: #6B3FB5; color: #fff; }
+.chip.t-out { background: var(--red); color: #fff; }
+
+/* Phrase ตัวอย่าง */
+.phrase .ttl { font: 800 24px/1.2 'Archivo', 'IBM Plex Sans Thai', sans-serif; color: var(--ink); margin-bottom: 14px; }
+.phrase .ttl small { font: 400 13px 'IBM Plex Sans Thai', sans-serif; color: var(--mute); }
+.tip { margin: 6px 0 16px; font-size: 16px; }
+#patList { margin: 0 0 10px; }
+.pat { margin: 0 6px 6px 0; }
+.pat.on { background: var(--ink); color: #fff; }
+
+.btns { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+/* ───────── 6) ไมค์ + ผลที่เล่น + คะแนน ───────── */
+.foot {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 28px;
+  align-items: start;
+  padding: 26px 0 34px;
+}
+
+#micBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 190px;
+  height: 64px;
+  font-size: 20px;
+  font-weight: 700;
+}
+#micBtn.on { background: var(--red); color: #fff; border-color: var(--ink); }
+
+.detected { font: 800 32px/1.2 'Archivo', sans-serif; min-height: 38px; }
+.score { display: flex; gap: 32px; text-align: center; font-size: 14px; color: var(--mute); }
+.score b { display: block; font: 800 34px 'Archivo', sans-serif; color: var(--ink); }
+
+.credit { padding: 0 0 36px; text-align: center; }
+.ashi { font-size: 30px; }
+
+/* ───────── มือถือ / จอแคบ ───────── */
+@media (max-width: 960px) {
+  .keys { grid-template-columns: 1fr; gap: 16px; }
+  .lg { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .panel { grid-template-columns: 1fr; gap: 28px; }
+  .now { padding: 24px 0 0; border-left: 0; border-top: 2px solid var(--ink); flex-direction: row; flex-wrap: wrap; gap: 24px 40px; }
+  .foot { grid-template-columns: 1fr auto; }
+  .foot .mic { grid-column: 1 / -1; }
+  #micBtn { width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .wrap { padding: 0 16px; }
+  .logo { font-size: 18px; }
+  .ctl { grid-template-columns: 1fr 1fr; }
+  .play { grid-column: 1 / -1; }
+  .f-key  { grid-column: 1; grid-row: 2; }
+  .f-bpm  { grid-column: 2; grid-row: 2; }
+  .f-ts   { grid-column: 1; grid-row: 3; }
+  .f-style{ grid-column: 2; grid-row: 3; }
+  .opts   { grid-row: 4; }
+  .row select, .row input { width: 100%; max-width: none; }
+  .score { gap: 20px; }
+  .foot { grid-template-columns: 1fr; }
+}
+
+/* ───────── นับถอยหลัง 3-2-1 ───────── */
+#countdown {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(244, 244, 241, .85);
+  color: var(--ink);
+  font: 800 clamp(160px, 34vw, 340px)/1 'Archivo', sans-serif;
+  pointer-events: none;        /* ยังกดปุ่มยกเลิกที่อยู่ข้างล่างได้ */
+  visibility: hidden;
+  opacity: 0;
+}
+#countdown.show { visibility: visible; opacity: 1; }
+#countdown span { display: block; animation: cdPop .9s ease-out both; }
+
+@keyframes cdPop {
+  from { transform: scale(1.6); opacity: 0; }
+  25%  { opacity: 1; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #countdown span { animation: none; }
+}
+/* ช่องจำนวนรอบ */
+.f-rounds {
+  grid-column: 1 / -1;
+  grid-row: 4;
+  max-width: 220px;
+}
+
+.f-rounds input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 2px solid var(--ink);
+  background: var(--card-bg);
+  color: var(--ink);
+  font: 700 20px 'Archivo', sans-serif;
+}
+
+/* หน้าสรุปผล */
+.result-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(28, 37, 28, 0.75);
+}
+
+.result-modal[hidden] {
+  display: none;
+}
+
+.result-card {
+  width: min(560px, 100%);
+  padding: 32px;
+  border: 2px solid var(--ink);
+  background: var(--card-bg);
+}
+
+.result-eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+
+.result-card h2 {
+  font-size: clamp(32px, 6vw, 48px);
+  margin-bottom: 8px;
+}
+
+.result-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.result-stats div {
+  border: 2px solid var(--ink);
+  padding: 14px 8px;
+  text-align: center;
+}
+
+.result-stats strong {
+  display: block;
+  font: 800 32px 'Archivo', sans-serif;
+}
+
+.result-stats span {
+  font-size: 13px;
+}
+
+.result-close {
+  width: 100%;
+  min-height: 54px;
+}
+
+@media (max-width: 600px) {
+  .f-rounds {
+    grid-row: 5;
+    max-width: none;
+  }
+
+  .result-card {
+    padding: 24px;
+  }
+}

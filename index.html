@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jazz Improv Trainer</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrap">
+
+<!-- 1) หัวเว็บ: ชื่อ | สถานะ MIDI | โหมด -->
+<header class="bar">
+  <h1 class="logo">Jazz Improv Trainer</h1>
+  <div class="tabs">
+    <span class="midi" id="midiState">MIDI: ยังไม่เชื่อมต่อ</span>
+    <button class="tab on" data-m="0">พื้นฐาน</button>
+    <button class="tab" data-m="1">ขั้นสูง</button>
+  </div>
+</header>
+<select id="mode" hidden><option value="0">พื้นฐาน</option><option value="1">ขั้นสูง</option></select>
+
+<!-- 2) แถบคอร์ดใหญ่ -->
+<section class="sec">
+  <div class="chart" id="prog"></div>
+
+  <!-- 3) เลือกเพลง / พิมพ์คอร์ด / ใช้คอร์ดนี้ -->
+  <div class="row">
+    <select id="preset" aria-label="เลือก Progression"></select>
+    <input type="text" id="chords" value="Dm7 G7 Cmaj7" aria-label="คอร์ด">
+    <button class="btn" id="apply">ใช้คอร์ดนี้</button>
+  </div>
+  <div class="hint" id="chErr">พิมพ์คอร์ดในคีย์ C เว้นวรรคระหว่างคอร์ด (รองรับ maj7, m7, 7, 7alt, m7b5/halfdim, aug, dim/dim7, sus4, 13, m9) ใส่จำนวนจังหวะในวงเล็บได้ เช่น Cm7(3) แล้วใช้ช่อง "คีย์" เปลี่ยนคีย์</div>
+</section>
+
+<!-- 4) คำอธิบายสี + คีย์บอร์ด -->
+<section class="sec keys">
+  <ul class="lg">
+    <li><i style="background:#1747C9"></i>โน้ตคอร์ด</li>
+    <li><i style="background:#A9C0F2"></i>โน้ต scale</li>
+    <li><i style="background:#F2B705"></i>โน้ตแนะนำ</li>
+    <li><i style="background:#D8432B"></i>นอก scale</li>
+    <li><i style="background:#6B3FB5"></i>เทนชัน (b9 #9 #11 b13)</li>
+    <li><i style="background:#17806D"></i>enclosure / approach</li>
+  </ul>
+  <div class="kb">
+    <div class="pw"><div id="piano"></div></div>
+    <p class="hint">คีย์บอร์ดคอม: A S D F G H J K = C D E F G A B C · W E T Y U = โน้ตดำ</p>
+  </div>
+</section>
+
+<!-- 5) แผงล่าง: ควบคุม | เน้นโน้ต + กำลังเล่น | Phrase -->
+<section class="panel">
+
+  <!-- ซ้าย: ควบคุม -->
+  <div class="col ctl">
+    <button class="play" id="start">▶ เริ่มฝึก</button>
+    <div class="f-key"><span class="lab">คีย์</span><select id="key"></select></div>
+    <div class="f-bpm">
+      <span class="lab">ความเร็ว (BPM 50–300)</span>
+      <div class="step">
+        <button id="bpmDown" aria-label="ช้าลง">−</button>
+        <input type="number" id="bpmv" value="120" min="50" max="300" step="1" inputmode="numeric" aria-label="ความเร็ว BPM (50 ถึง 300)">
+        <button id="bpmUp" aria-label="เร็วขึ้น">+</button>
+      </div>
+    </div>
+    <div class="f-ts"><span class="lab">จังหวะ</span>
+      <select id="ts"><option>4/4</option><option>3/4</option><option>2/4</option><option>5/4</option><option>6/8</option><option>12/8</option></select>
+    </div>
+    <div class="f-style"><span class="lab">สไตล์</span>
+      <select id="styleSelect">
+        <option value="swing">Swing</option>
+        <option value="bebop">Bebop</option>
+        <option value="ballad">Ballad</option>
+      </select>
+    </div>
+    <div class="opts">
+      <label><input type="checkbox" id="onP" checked> เปียโน</label>
+      <label><input type="checkbox" id="onB" checked> เบส</label>
+      <label><input type="checkbox" id="onD" checked> กลอง</label>
+    </div>
+  </div>
+  <div class="f-rounds">
+  <label class="lab" for="rounds">จำนวนรอบที่ต้องการฝึก</label>
+  <input
+    type="number"
+    id="rounds"
+    value="2"
+    min="1"
+    max="20"
+    step="1"
+  >
+</div>
+
+  <!-- กลาง: เน้นเล่นโน้ต / กำลังเล่น -->
+  <div class="col now">
+    <div>
+      <span class="lab">เน้นเล่นโน้ต</span>
+      <div class="chips" id="guide"></div>
+    </div>
+    <div>
+      <span class="lab">กำลังเล่น</span>
+      <div class="chord" id="sugName">—</div>
+    </div>
+  </div>
+
+  <!-- ขวา: Phrase ตัวอย่าง -->
+  <div class="col phrase">
+    <span class="lab ttl">Phrase ตัวอย่าง <small>(ไฮไลต์สีเหลืองบนเปียโน)</small></span>
+    <div class="chips" id="lick"></div>
+    <div id="patList"></div>
+    <p class="tip" id="tip"></p>
+    <div class="btns">
+      <button class="btn" id="hear">ฟังตัวอย่าง</button>
+      <button class="btn" id="dice">ไอเดียใหม่</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- 6) ไมค์ + ผลที่คุณเล่น -->
+<section class="foot">
+  <div class="mic">
+    <button id="micBtn" class="sm">🎤 เปิดไมค์</button>
+  </div>
+  <div class="played">
+    <span class="lab">คอร์ดที่คุณกด</span>
+    <div class="detected" id="detected">—</div>
+    <div class="chips" id="heldInfo"></div>
+    <div class="hint" id="fitMsg"></div>
+    <div class="okmsg" id="noteMsg"></div>
+  </div>
+  <div class="score">
+    <span><b id="good">0</b>เข้า</span>
+    <span><b id="badc">0</b>หลุด</span>
+    <span><b id="pct">–</b>แม่นยำ</span>
+  </div>
+</section>
+<section id="resultModal" class="result-modal" hidden>
+  <div class="result-card">
+    <p class="result-eyebrow">SESSION COMPLETE</p>
+
+    <h2>ฝึกเสร็จแล้ว!</h2>
+    <p id="resultSummary">คุณฝึกครบตามจำนวนรอบแล้ว</p>
+
+    <div class="result-stats">
+      <div>
+        <strong id="resultGood">0</strong>
+        <span>เข้า</span>
+      </div>
+
+      <div>
+        <strong id="resultBad">0</strong>
+        <span>หลุด</span>
+      </div>
+
+      <div>
+        <strong id="resultPct">–</strong>
+        <span>ความแม่นยำ</span>
+      </div>
+    </div>
+
+    <button class="play result-close" id="closeResult">
+      กลับไปฝึกต่อ
+    </button>
+  </div>
+</section>
+
+<footer class="credit">
+  <span class="ashi">Made By Ashi Supakorn</span>
+</footer>
+
+</div>
+<!-- เรียกใช้สคริปต์ Midi.js ก่อน script.js เสมอ -->
+<script src="https://unpkg.com/@tonejs/midi"></script>
+<!-- เสียงเปียโนจริง (ต้องอยู่ก่อน script.js) -->
+<script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
+<script src="https://unpkg.com/pitchy@4.1.0/dist/pitchy.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
